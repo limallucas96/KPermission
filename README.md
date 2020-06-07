@@ -116,3 +116,27 @@ enum class PermissionType(val code: Int, val permissions: Array<String>) {
     }
 }
 ```
+
+
+## Installation
+
+Current version: 0.1.0
+
+Add it in your root build.gradle at the end of repositories:
+
+```groovy
+allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+
+Add the dependency
+
+```groovy
+dependencies {
+  implementation 'com.github.limallucas96:PermissionUtils:0.1.0'
+}
+```
