@@ -1,11 +1,8 @@
 # PermissionUtils
-Android library for handling permissions
-
-Written in kotlin
-
+Android library for handling permissions. Written in kotlin.
 ## Usage
 
-Here's a minimum example, in which you register a `MainActivity` which requires `Manifest.permission.CAMERA`.
+Here's a minimum example, in which you register a `MainActivity` that requires `Manifest.permission.CAMERA`.
 
 ### 0. Prepare AndroidManifest
 
@@ -22,7 +19,7 @@ Add the following line to `AndroidManifest.xml`:
  override fun onPermissionDenied(requestCode: Int) {}
 ```
 
-### 1.2 When initializing PermissionUtils, be sure to give an activity and listener context, otherside it will throw NullPointerException
+### 1.2 When initializing PermissionUtils, make sure to give an activity and listener context, otherwise it will throw NullPointerException
 
 ```kotlin
 private lateinit var permissionsUtils: PermissionUtils
@@ -35,8 +32,9 @@ permissionsUtils = PermissionUtils.permissionBuilder {
 
 ### 1.3 Asking for permissions
 
-Create an RequestCode and an array of string with the permissions you want to ask. 
-The code will be returned from on both PermissionListener success and error callback, so you can handle it in your class.
+Create an RequestCode and a String Array with the permissions you want to ask. 
+
+The code will be returned by the interface methods, so you can deal with success or erros. 
 
 ```kotlin
 camera.setOnClickListener {
@@ -47,7 +45,7 @@ camera.setOnClickListener {
 }
 ```
 
-### 1.4 Handling the permission result. 
+### 1.4 Let the library handle the permission result. 
 
 ```kotlin
 override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<out String>,grantResults: IntArray){
