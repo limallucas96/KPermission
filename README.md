@@ -15,11 +15,43 @@ Add the following line to `AndroidManifest.xml`:
 
 ### 1. Init the library in your view
 
-Make your activity implements PermissionListener so you'll be aware when your permission has been denied or granted by:
+Make your class implements PermissionListener so you'll be aware when your permission has been granted or denied.
 
 ```kotlin
  override fun onPermissionGranted(requestCode: Int) {}
  override fun onPermissionDenied(requestCode: Int) {}
+```
+
+When initializing PermissionUtils, be sure to give an activity and listener context, otherside it will throw NullPointerException
+
+```kotlin
+private lateinit var permissionsUtils: PermissionUtils
+
+permissionsUtils = PermissionUtils.permissionBuilder {
+   activity = this@MainActivity
+   listener = this@MainActivity
+}
+```
+
+Asking for permissions
+Create an RequestCode and an array of string with the permissions you want to ask. 
+The code will be returned from on both PermissionListener success and error callback, so you can handle it in your class.
+
+```kotlin
+camera.setOnClickListener {
+  permissionsUtils.ask(
+      PermissionType.CAMERA_TYPE.code,
+      PermissionType.CAMERA_TYPE.permissions
+ )
+}
+```
+
+Handling the permission result. 
+```kotlin
+override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<out String>,grantResults: IntArray){
+  super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+  permissionsUtils.onRequestPermissionsResult(requestCode, grantResults)
+}
 ```
 
 ```kotlin
