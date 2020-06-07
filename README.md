@@ -13,16 +13,16 @@ Add the following line to `AndroidManifest.xml`:
  
 `<uses-permission android:name="android.permission.CAMERA" />`
 
-### 1. Init the library in your view
+### 1. Implementation
 
-Make your class implements PermissionListener so you'll be aware when your permission has been granted or denied.
+### 1.1 Make your class implements PermissionListener so you'll be aware when your permission has been granted or denied.
 
 ```kotlin
  override fun onPermissionGranted(requestCode: Int) {}
  override fun onPermissionDenied(requestCode: Int) {}
 ```
 
-When initializing PermissionUtils, be sure to give an activity and listener context, otherside it will throw NullPointerException
+### 1.2 When initializing PermissionUtils, be sure to give an activity and listener context, otherside it will throw NullPointerException
 
 ```kotlin
 private lateinit var permissionsUtils: PermissionUtils
@@ -33,7 +33,8 @@ permissionsUtils = PermissionUtils.permissionBuilder {
 }
 ```
 
-Asking for permissions
+### 1.3 Asking for permissions
+
 Create an RequestCode and an array of string with the permissions you want to ask. 
 The code will be returned from on both PermissionListener success and error callback, so you can handle it in your class.
 
@@ -46,13 +47,16 @@ camera.setOnClickListener {
 }
 ```
 
-Handling the permission result. 
+### 1.4 Handling the permission result. 
+
 ```kotlin
 override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<out String>,grantResults: IntArray){
   super.onRequestPermissionsResult(requestCode, permissions, grantResults)
   permissionsUtils.onRequestPermissionsResult(requestCode, grantResults)
 }
 ```
+
+## Full implementation
 
 ```kotlin
 class MainActivity : AppCompatActivity(), PermissionListener {
@@ -101,7 +105,8 @@ class MainActivity : AppCompatActivity(), PermissionListener {
 
 ### 2. We strongly recommend to create an enum class to organize your permissions. 
 
-Make your activity implements PermissionListener so you'll be aware when your permission has been denied or granted by:
+We advise you to organize your requests code and permissions inside an enum class. 
+
 
 ```kotlin
 enum class PermissionType(val code: Int, val permissions: Array<String>) {
