@@ -66,3 +66,16 @@ class MainActivity : AppCompatActivity(), PermissionListener {
 }
 
 ```
+
+### 2. We strongly recommend to create an enum class to organize your permissions. 
+
+Make your activity implements PermissionListener so you'll be aware when your permission has been denied or granted by:
+
+```kotlin
+enum class PermissionType(val code: Int, val permissions: Array<String>) {
+    CAMERA_TYPE(123, arrayOf(CAMERA, WRITE_EXTERNAL_STORAGE));
+    companion object {
+        fun fromInt(code: Int) = values().firstOrNull { it.code == code }
+    }
+}
+```
