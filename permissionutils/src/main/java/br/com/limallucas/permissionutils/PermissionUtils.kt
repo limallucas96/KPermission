@@ -53,3 +53,4 @@ class PermissionUtils {
         //        val testValue = permissions.firstOrNull {  activity?.shouldShowRequestPermissionRationale(it) == false }
     }
 }
+git p
