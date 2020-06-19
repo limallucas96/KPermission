@@ -52,5 +52,9 @@ class MainFragment : Fragment(), PermissionListener {
         val result = "onPermissionDenied ${PermissionType.fromInt(requestCode)?.name}"
         Toast.makeText(requireContext(), result, Toast.LENGTH_SHORT).show()
     }
+
+    override fun onNeverAskAgain(neverAskAgain: String, requestCode: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
 

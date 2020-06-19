@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity(), PermissionListener {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        permissionsUtils.onRequestPermissionsResult(requestCode, grantResults)
+        permissionsUtils.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -55,15 +55,21 @@ class MainActivity : AppCompatActivity(), PermissionListener {
     }
 
     override fun onPermissionGranted(requestCode: Int) {
-        //Treated granted permission based on request code
+        //Treats granted permission based on request code
         val result = "onPermissionGranted ${PermissionType.fromInt(requestCode)?.name}"
         Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
     }
 
     override fun onPermissionDenied(requestCode: Int) {
-        //Treated denied permission based on request code
+        //Treats denied permission based on request code
         val result = "onPermissionDenied ${PermissionType.fromInt(requestCode)?.name}"
         Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onNeverAskAgain(neverAskAgain: String, requestCode: Int) {
+        //Treats onNeverAskAgain. Gives which permission was selected to never be asked again and request code.
+        val result = " onNeverAskAgain:  ${PermissionType.fromInt(requestCode)?.name}"
+        Toast.makeText(this, neverAskAgain.plus(result), Toast.LENGTH_SHORT).show()
     }
 
     private fun addFragment(fragment: Fragment) {
