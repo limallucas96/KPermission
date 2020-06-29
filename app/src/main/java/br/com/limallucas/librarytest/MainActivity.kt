@@ -66,10 +66,10 @@ class MainActivity : AppCompatActivity(), PermissionListener {
         Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onNeverAskAgain(neverAskAgain: String, requestCode: Int) {
+    override fun onNeverAskAgain(requestCode: Int) {
         //Treats onNeverAskAgain. Gives which permission was selected to never be asked again and request code.
         val result = " onNeverAskAgain:  ${PermissionType.fromInt(requestCode)?.name}"
-        Toast.makeText(this, neverAskAgain.plus(result), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
     }
 
     private fun addFragment(fragment: Fragment) {

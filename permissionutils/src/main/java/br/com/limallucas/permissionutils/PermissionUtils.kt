@@ -1,11 +1,8 @@
 package br.com.limallucas.permissionutils
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.PackageManager
-import android.os.Build
-import androidx.annotation.NonNull
 import androidx.core.app.ActivityCompat
 
 class PermissionUtils {
@@ -38,19 +35,14 @@ class PermissionUtils {
         val didGrantAllPermissions =
             grantResults.map { it == PackageManager.PERMISSION_GRANTED }.find { !it } ?: true
 
-        val didSelectNeverAskAgain =
-            permissions.find { activity?.shouldShowRequestPermissionRationale(it) == true }
-
         if (didGrantAllPermissions) {
             listener?.onPermissionGranted(requestCode)
-        } else if (didSelectNeverAskAgain == null) {
-            listener?.onNeverAskAgain("", requestCode)
         } else {
-            listener?.onPermissionDenied(requestCode)
+            permissions.find { activity?.shouldShowRequestPermissionRationale(it) == true }?.let {
+                listener?.onPermissionDenied(requestCode)
+            } ?: run {
+                listener?.onNeverAskAgain(requestCode)
+            }
         }
-
-        //todo
-        //        val testValue = permissions.firstOrNull {  activity?.shouldShowRequestPermissionRationale(it) == false }
     }
 }
-git p
