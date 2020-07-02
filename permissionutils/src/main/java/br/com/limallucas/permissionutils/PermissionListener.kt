@@ -4,4 +4,5 @@ interface PermissionListener {
     fun onPermissionGranted(requestCode: Int)
     fun onPermissionDenied(requestCode: Int)
     fun onNeverAskAgain(requestCode: Int)
+
 }

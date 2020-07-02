@@ -20,11 +20,19 @@ class PermissionUtils {
         }
     }
 
-    fun ask(reqCode: Int, perms: Array<String>) {
+    fun ask(block: AskBuilder.() -> Unit) {
+        val builder = AskBuilder().apply(block).build()
         activity?.let {
-            ActivityCompat.requestPermissions(it, perms, reqCode)
+            val permissions = builder.permissions.map { it.name }.toTypedArray()
+            ActivityCompat.requestPermissions(it, permissions, builder.requestCode)
         }
     }
+
+//    fun ask(reqCode: Int, perms: Array<String>) {
+//        activity?.let {
+//            ActivityCompat.requestPermissions(it, perms, reqCode)
+//        }
+//    }
 
     @SuppressLint("NewApi")
     fun onRequestPermissionsResult(

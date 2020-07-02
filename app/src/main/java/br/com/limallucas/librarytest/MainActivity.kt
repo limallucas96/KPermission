@@ -1,5 +1,6 @@
 package br.com.limallucas.librarytest
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -24,17 +25,21 @@ class MainActivity : AppCompatActivity(), PermissionListener {
         }
 
         location.setOnClickListener {
-            permissionsUtils.ask(
-                PermissionType.LOCATION_TYPE.code,
-                PermissionType.LOCATION_TYPE.permissions
-            )
+            permissionsUtils.ask {
+                requestCode = 123
+                permissions {
+                    permissionsType { type = Manifest.permission.WRITE_EXTERNAL_STORAGE }
+                    permissionsType { type = Manifest.permission.RECORD_AUDIO }
+                    permissionsType { type = Manifest.permission.CAMERA }
+                }
+            } //add infix fun like onResult {status, requestCode -> }
         }
 
         camera.setOnClickListener {
-            permissionsUtils.ask(
-                PermissionType.CAMERA_TYPE.code,
-                PermissionType.CAMERA_TYPE.permissions
-            )
+//            permissionsUtils.ask(
+//                PermissionType.CAMERA_TYPE.code,
+//                PermissionType.CAMERA_TYPE.permissions
+//            )
         }
     }
 
@@ -50,7 +55,7 @@ class MainActivity : AppCompatActivity(), PermissionListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         PermissionType.fromInt(requestCode)?.let { type ->
-            permissionsUtils.ask(type.code, type.permissions)
+//            permissionsUtils.ask(type.code, type.permissions)
         }
     }
 

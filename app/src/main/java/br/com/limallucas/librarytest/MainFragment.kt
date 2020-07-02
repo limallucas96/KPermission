@@ -37,7 +37,7 @@ class MainFragment : Fragment(), PermissionListener {
         }
 
         audio.setOnClickListener {
-            permissionsUtils.ask(PermissionType.AUDIO_TYPE.code, PermissionType.AUDIO_TYPE.permissions)
+//            permissionsUtils.ask(PermissionType.AUDIO_TYPE.code, PermissionType.AUDIO_TYPE.permissions)
         }
     }
 
