@@ -28,28 +28,26 @@ class PermissionUtils {
         }
     }
 
-//    fun ask(reqCode: Int, perms: Array<String>) {
-//        activity?.let {
-//            ActivityCompat.requestPermissions(it, perms, reqCode)
-//        }
-//    }
+    fun ask(reqCode: Int, perms: Array<String>) {
+        activity?.let {
+            ActivityCompat.requestPermissions(it, perms, reqCode)
+        }
+    }
 
     @SuppressLint("NewApi")
-    fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        val didGrantAllPermissions =
-            grantResults.map { it == PackageManager.PERMISSION_GRANTED }.find { !it } ?: true
+    fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+
+        val didGrantAllPermissions = grantResults.map { it == PackageManager.PERMISSION_GRANTED }.find { !it } ?: true
 
         if (didGrantAllPermissions) {
             listener?.onPermissionGranted(requestCode)
         } else {
-            permissions.find { activity?.shouldShowRequestPermissionRationale(it) == true }?.let {
-                listener?.onPermissionDenied(requestCode)
-            } ?: run {
-                listener?.onNeverAskAgain(requestCode)
+            permissions.filterIndexed { index, s ->  grantResults[index] != PackageManager.PERMISSION_GRANTED }.let { deniedPermissions ->
+                deniedPermissions.find { activity?.shouldShowRequestPermissionRationale(it) == true }?.let {
+                    listener?.onPermissionDenied(requestCode)
+                } ?: run {
+                    listener?.onNeverAskAgain(requestCode)
+                }
             }
         }
     }
