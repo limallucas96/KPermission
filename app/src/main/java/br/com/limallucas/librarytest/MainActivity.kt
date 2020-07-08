@@ -12,6 +12,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), PermissionListener {
 
+    companion object {
+        const val CAMERA_RESULT_CODE = 1234
+    }
+
     private lateinit var permissionsUtils: PermissionUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +30,7 @@ class MainActivity : AppCompatActivity(), PermissionListener {
 
         location.setOnClickListener {
             permissionsUtils.ask {
-                requestCode = 123
+                requestCode = CAMERA_RESULT_CODE
                 permissions {
                     permissionsType { type = Manifest.permission.WRITE_EXTERNAL_STORAGE }
                     permissionsType { type = Manifest.permission.RECORD_AUDIO }
@@ -52,29 +56,19 @@ class MainActivity : AppCompatActivity(), PermissionListener {
         permissionsUtils.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        PermissionType.fromInt(requestCode)?.let { type ->
-//            permissionsUtils.ask(type.code, type.permissions)
-        }
-    }
-
     override fun onPermissionGranted(requestCode: Int) {
-        //Treats granted permission based on request code
-        val result = "onPermissionGranted ${PermissionType.fromInt(requestCode)?.name}"
-        Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
+        //You may treat many result codes with `when` or `if/else conditional statements
+        Toast.makeText(this, "onPermissionGranted: $requestCode", Toast.LENGTH_SHORT).show()
     }
 
     override fun onPermissionDenied(requestCode: Int) {
-        //Treats denied permission based on request code
-        val result = "onPermissionDenied ${PermissionType.fromInt(requestCode)?.name}"
-        Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
+        //You may treat many result codes with `when` or `if/else conditional statements
+        Toast.makeText(this, "onPermissionDenied: $requestCode", Toast.LENGTH_SHORT).show()
     }
 
     override fun onNeverAskAgain(requestCode: Int) {
-        //Treats onNeverAskAgain. Gives which permission was selected to never be asked again and request code.
-        val result = " onNeverAskAgain:  ${PermissionType.fromInt(requestCode)?.name}"
-        Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
+        //You may treat many result codes with `when` or `if/else conditional statements
+        Toast.makeText(this, "onNeverAskAgain: $requestCode", Toast.LENGTH_SHORT).show()
     }
 
     private fun addFragment(fragment: Fragment) {

@@ -42,19 +42,18 @@ class MainFragment : Fragment(), PermissionListener {
     }
 
     override fun onPermissionGranted(requestCode: Int) {
-        //Treated granted permission based on request code
-        val result = "onPermissionGranted ${PermissionType.fromInt(requestCode)?.name}"
-        Toast.makeText(requireContext(), result, Toast.LENGTH_SHORT).show()
+        //You may treat many result codes with `when` or `if/else conditional statements
+        Toast.makeText(requireContext(), "onPermissionGranted: $requestCode", Toast.LENGTH_SHORT).show()
     }
 
     override fun onPermissionDenied(requestCode: Int) {
-        //Treated denied permission based on request code
-        val result = "onPermissionDenied ${PermissionType.fromInt(requestCode)?.name}"
-        Toast.makeText(requireContext(), result, Toast.LENGTH_SHORT).show()
+        //You may treat many result codes with `when` or `if/else conditional statements
+        Toast.makeText(requireContext(), "onPermissionDenied: $requestCode", Toast.LENGTH_SHORT).show()
     }
 
     override fun onNeverAskAgain(requestCode: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //You may treat many result codes with `when` or `if/else conditional statements
+        Toast.makeText(requireContext(), "onNeverAskAgain: $requestCode", Toast.LENGTH_SHORT).show()
     }
 }
 
