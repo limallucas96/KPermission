@@ -2,9 +2,9 @@ package br.com.limallucas.librarytest
 
 import android.Manifest
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import br.com.limallucas.permissionutils.PermissionResult
 import br.com.limallucas.permissionutils.PermissionUtils
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -21,22 +21,19 @@ class MainActivity : AppCompatActivity() {
 
         location.setOnClickListener {
             permissionsUtils.ask {
-                permissions {
-                    permissionsType { type = Manifest.permission.ACCESS_FINE_LOCATION }
-                    permissionsType { type = Manifest.permission.ACCESS_COARSE_LOCATION }
-                }
+                permissionName { name = Manifest.permission.ACCESS_FINE_LOCATION }
+                permissionName { name = Manifest.permission.ACCESS_COARSE_LOCATION }
             } onAskResult { result ->
-                //result will return a value of GRANTED, DENIED or NEVER_ASK_AGAIN.
-                Toast.makeText(this, "$result", Toast.LENGTH_SHORT).show()
+                when (result) {
+                    PermissionResult.GRANTED -> {}
+                    PermissionResult.DENIED -> {}
+                    PermissionResult.NEVER_ASK_AGAIN -> {}
+                }
             }
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         permissionsUtils.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }

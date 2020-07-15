@@ -16,16 +16,14 @@ class PermissionUtils(private val activity: Activity) {
         this.onResult = onResult
     }
 
-    fun ask(block: AskBuilder.() -> Unit): PermissionUtils {
-        val builder = AskBuilder().apply(block).build()
+    fun ask(block: AppPermission.() -> Unit): PermissionUtils {
+        val builder = AppPermission().apply(block)
 
         if (!shouldCheckForPermissions()) {
             onResult.invoke(PermissionResult.GRANTED)
         } else {
-            activity?.let {
-                val permissions = builder.permissions.map { it.name }.toTypedArray()
-                ActivityCompat.requestPermissions(it, permissions, 999)
-            }
+            val permissions = builder.map { it.name }.toTypedArray()
+            ActivityCompat.requestPermissions(activity, permissions, 999)
         }
         return this
     }
@@ -45,7 +43,7 @@ class PermissionUtils(private val activity: Activity) {
         } else {
             permissions.filterIndexed { index, _ -> grantResults[index] != PackageManager.PERMISSION_GRANTED }
                 .let { deniedPermissions ->
-                    deniedPermissions.find { activity?.shouldShowRequestPermissionRationale(it) == true }
+                    deniedPermissions.find { activity.shouldShowRequestPermissionRationale(it) }
                         ?.let {
                             onResult.invoke(PermissionResult.DENIED)
                         } ?: run {
