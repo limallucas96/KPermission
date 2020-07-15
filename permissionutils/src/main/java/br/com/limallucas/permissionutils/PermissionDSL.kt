@@ -3,16 +3,15 @@ package br.com.limallucas.permissionutils
 @DslMarker
 annotation class PersonDsl
 
-data class Permission(val requestCode: Int, val permissions: List<AppPermissions>)
+data class Permission(val permissions: List<AppPermissions>)
 
 data class AppPermissions(val name: String)
 
 @PersonDsl
 class AskBuilder {
-    var requestCode: Int = 0
     private var permissionsName = mutableListOf<AppPermissions>()
 
-    fun build() = Permission(requestCode, permissionsName)
+    fun build() = Permission(permissionsName)
 
     fun permissions(block: AppPermission.() -> Unit) {
         permissionsName.addAll(AppPermission().apply(block))
