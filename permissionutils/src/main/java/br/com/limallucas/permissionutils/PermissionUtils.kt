@@ -10,6 +10,7 @@ class PermissionUtils {
 
     var activity: Activity? = null
     var listener: PermissionListener? = null
+    private lateinit var onResult: (result: PermissionResult) -> Unit
 
     companion object {
         fun permissionBuilder(initializeAction: PermissionUtils.() -> Unit): PermissionUtils {
@@ -23,7 +24,11 @@ class PermissionUtils {
 
     private fun shouldCheckForPermissions() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
 
-    fun ask(block: AskBuilder.() -> Unit) {
+    infix fun onAskResult(onResult: (result: PermissionResult) -> Unit) {
+        this.onResult = onResult
+    }
+
+    fun ask(block: AskBuilder.() -> Unit): PermissionUtils {
         val builder = AskBuilder().apply(block).build()
 
         if (!shouldCheckForPermissions()) {
@@ -34,6 +39,7 @@ class PermissionUtils {
                 ActivityCompat.requestPermissions(it, permissions, builder.requestCode)
             }
         }
+        return this
     }
 
     fun ask(requestCode: Int, perms: Array<String>) {
@@ -57,15 +63,18 @@ class PermissionUtils {
             grantResults.map { it == PackageManager.PERMISSION_GRANTED }.find { !it } ?: true
 
         if (didGrantAllPermissions) {
+            onResult.invoke(PermissionResult.GRANTED)
             listener?.onPermissionGranted(requestCode)
         } else {
-            permissions.filterIndexed { index, s -> grantResults[index] != PackageManager.PERMISSION_GRANTED }
+            permissions.filterIndexed { index, _ -> grantResults[index] != PackageManager.PERMISSION_GRANTED }
                 .let { deniedPermissions ->
                     deniedPermissions.find { activity?.shouldShowRequestPermissionRationale(it) == true }
                         ?.let {
                             listener?.onPermissionDenied(requestCode)
+                            onResult.invoke(PermissionResult.DENIED)
                         } ?: run {
-                            listener?.onNeverAskAgain(requestCode)
+                        onResult.invoke(PermissionResult.NEVER_ASK_AGAIN)
+                        listener?.onNeverAskAgain(requestCode)
                     }
                 }
         }

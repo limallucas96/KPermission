@@ -3,6 +3,7 @@ package br.com.limallucas.librarytest
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -13,7 +14,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(), PermissionListener {
 
     companion object {
-        const val CAMERA_RESULT_CODE = 1234
+        const val LOCATION_RESULT_CODE = 123
+        const val CAMERA_RESULT_CODE = 456
     }
 
     private lateinit var permissionsUtils: PermissionUtils
@@ -30,20 +32,15 @@ class MainActivity : AppCompatActivity(), PermissionListener {
 
         location.setOnClickListener {
             permissionsUtils.ask {
-                requestCode = CAMERA_RESULT_CODE
+                requestCode = LOCATION_RESULT_CODE
                 permissions {
-                    permissionsType { type = Manifest.permission.WRITE_EXTERNAL_STORAGE }
-                    permissionsType { type = Manifest.permission.RECORD_AUDIO }
-                    permissionsType { type = Manifest.permission.CAMERA }
+                    permissionsType { type = Manifest.permission.ACCESS_FINE_LOCATION }
+                    permissionsType { type = Manifest.permission.ACCESS_COARSE_LOCATION }
+//                    permissionsType { type = Manifest.permission.ACCESS_BACKGROUND_LOCATION } TODO("Check about ACCESS_BACKGROUND_LOCATION")
                 }
-            } //add infix fun like onResult {status, requestCode -> }
-        }
-
-        camera.setOnClickListener {
-//            permissionsUtils.ask(
-//                PermissionType.CAMERA_TYPE.code,
-//                PermissionType.CAMERA_TYPE.permissions
-//            )
+            } onAskResult { result ->
+                Toast.makeText(this, "$result", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
