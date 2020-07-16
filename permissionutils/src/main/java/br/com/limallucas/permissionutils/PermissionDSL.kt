@@ -7,7 +7,7 @@ data class AppPermissions(val name: String)
 
 @PersonDsl
 class AppPermission : ArrayList<AppPermissions>() {
-    fun permissionName(block: PermissionBuilder.() -> Unit) {
+    fun permission(block: PermissionBuilder.() -> Unit) {
         add(PermissionBuilder().apply(block).build())
     }
 }

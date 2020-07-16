@@ -2,6 +2,7 @@ package br.com.limallucas.librarytest
 
 import android.Manifest
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import br.com.limallucas.permissionutils.PermissionResult
@@ -21,14 +22,28 @@ class MainActivity : AppCompatActivity() {
 
         location.setOnClickListener {
             permissionsUtils.ask {
-                permissionName { name = Manifest.permission.ACCESS_FINE_LOCATION }
-                permissionName { name = Manifest.permission.ACCESS_COARSE_LOCATION }
+                permission { name = Manifest.permission.ACCESS_FINE_LOCATION }
+                permission { name = Manifest.permission.ACCESS_COARSE_LOCATION }
             } onAskResult { result ->
                 when (result) {
                     PermissionResult.GRANTED -> {}
                     PermissionResult.DENIED -> {}
                     PermissionResult.NEVER_ASK_AGAIN -> {}
                 }
+                Toast.makeText(this, "Location: $result", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        camera.setOnClickListener {
+            permissionsUtils.ask {
+                permission { name = Manifest.permission.CAMERA }
+            } onAskResult { result ->
+                when (result) {
+                    PermissionResult.GRANTED -> {}
+                    PermissionResult.DENIED -> {}
+                    PermissionResult.NEVER_ASK_AGAIN -> {}
+                }
+                Toast.makeText(this, "Camera: $result", Toast.LENGTH_SHORT).show()
             }
         }
     }
