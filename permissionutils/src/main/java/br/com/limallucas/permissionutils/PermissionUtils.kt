@@ -17,8 +17,7 @@ class PermissionUtils() {
         this.fragment = fragment
     }
 
-    private lateinit var onResult: (result: PermissionResult) -> Unit
-    private var type: ViewType = ViewType.INVALID
+    private var onResult: ((result: PermissionResult) -> Unit)? = null
     private var activity: Activity? = null
     private var fragment: Fragment? = null
 
@@ -28,14 +27,6 @@ class PermissionUtils() {
         this.onResult = onResult
     }
 
-    private fun invokeByType(result: PermissionResult) {
-        if (type == ViewType.FRAGMENT) {
-            onResult.invoke(result)
-        } else if (type == ViewType.ACTIVITY) {
-            onResult.invoke(result)
-        }
-    }
-
     fun ask(block: AppPermission.() -> Unit): PermissionUtils {
         val permissions = AppPermission().apply(block).map { it.name }.toTypedArray()
 
@@ -43,18 +34,16 @@ class PermissionUtils() {
             return this
         }
 
-        type = ViewType.isTypeOf(activity, fragment)
-
-        if (!shouldCheckForPermissions()) {
-            invokeByType(PermissionResult.GRANTED)
-        } else {
+//        if (!shouldCheckForPermissions()) {
+//            onResult?.invoke(PermissionResult.GRANTED)
+//        } else {
             activity?.let {
                 ActivityCompat.requestPermissions(it, permissions, 999)
             }
             fragment?.let {
                 it.requestPermissions(permissions, 999)
             }
-        }
+//        }
         return this
     }
 
@@ -68,21 +57,21 @@ class PermissionUtils() {
         val didGrantAllPermissions = grantResults.map { it == PackageManager.PERMISSION_GRANTED }.find { !it } ?: true
 
         if (didGrantAllPermissions) {
-            invokeByType(PermissionResult.GRANTED)
+            onResult?.invoke(PermissionResult.GRANTED)
         } else {
             permissions.filterIndexed { index, _ -> grantResults[index] != PackageManager.PERMISSION_GRANTED }.let { deniedPermissions ->
                 activity?.let { act ->
                     deniedPermissions.find { act.shouldShowRequestPermissionRationale(it) }?.let {
-                        invokeByType(PermissionResult.DENIED)
+                        onResult?.invoke(PermissionResult.DENIED)
                     } ?: run {
-                        invokeByType(PermissionResult.NEVER_ASK_AGAIN)
+                        onResult?.invoke(PermissionResult.NEVER_ASK_AGAIN)
                     }
                 }
                 fragment?.let { fgt ->
                     deniedPermissions.find { fgt.shouldShowRequestPermissionRationale(it) }?.let {
-                        invokeByType(PermissionResult.DENIED)
+                        onResult?.invoke(PermissionResult.DENIED)
                     } ?: run {
-                        invokeByType(PermissionResult.NEVER_ASK_AGAIN)
+                        onResult?.invoke(PermissionResult.NEVER_ASK_AGAIN)
                     }
                 }
             }
