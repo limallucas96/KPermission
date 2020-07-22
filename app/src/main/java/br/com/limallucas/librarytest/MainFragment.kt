@@ -27,7 +27,7 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        permissionsUtils = PermissionUtils(this)
+        permissionsUtils =  PermissionUtils(this)
 
         audio.setOnClickListener {
             permissionsUtils.ask {

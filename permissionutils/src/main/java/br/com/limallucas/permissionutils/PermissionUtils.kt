@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 
 class PermissionUtils() {
@@ -21,10 +22,23 @@ class PermissionUtils() {
     private var activity: Activity? = null
     private var fragment: Fragment? = null
 
-    private fun shouldCheckForPermissions() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+    private fun greaterThanMarshmallow() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
 
     infix fun onAskResult(onResult: (result: PermissionResult) -> Unit) {
         this.onResult = onResult
+    }
+
+    private fun checkSelfPermission(permissions: Array<out String>): Boolean {
+        var isAllGranted = false
+        (activity?.applicationContext ?: fragment?.context)?.let { context ->
+            isAllGranted = permissions.map { ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED }.find { !it } ?: true
+        }
+        return isAllGranted
+    }
+
+    private fun invoke(result: PermissionResult) {
+        onResult?.invoke(result)
+        onResult = null
     }
 
     fun ask(block: AppPermission.() -> Unit): PermissionUtils {
@@ -34,16 +48,20 @@ class PermissionUtils() {
             return this
         }
 
-//        if (!shouldCheckForPermissions()) {
-//            onResult?.invoke(PermissionResult.GRANTED)
-//        } else {
-            activity?.let {
-                ActivityCompat.requestPermissions(it, permissions, 999)
+        if (greaterThanMarshmallow()) {
+            if (checkSelfPermission(permissions)) {
+                invoke(PermissionResult.GRANTED)
+            } else {
+                activity?.let {
+                    ActivityCompat.requestPermissions(it, permissions, 999)
+                }
+                fragment?.let {
+                    it.requestPermissions(permissions, 999)
+                }
             }
-            fragment?.let {
-                it.requestPermissions(permissions, 999)
-            }
-//        }
+        } else {
+            invoke(PermissionResult.GRANTED)
+        }
         return this
     }
 
@@ -57,24 +75,25 @@ class PermissionUtils() {
         val didGrantAllPermissions = grantResults.map { it == PackageManager.PERMISSION_GRANTED }.find { !it } ?: true
 
         if (didGrantAllPermissions) {
-            onResult?.invoke(PermissionResult.GRANTED)
+            invoke(PermissionResult.GRANTED)
         } else {
             permissions.filterIndexed { index, _ -> grantResults[index] != PackageManager.PERMISSION_GRANTED }.let { deniedPermissions ->
                 activity?.let { act ->
                     deniedPermissions.find { act.shouldShowRequestPermissionRationale(it) }?.let {
-                        onResult?.invoke(PermissionResult.DENIED)
+                        invoke(PermissionResult.DENIED)
                     } ?: run {
-                        onResult?.invoke(PermissionResult.NEVER_ASK_AGAIN)
+                        invoke(PermissionResult.NEVER_ASK_AGAIN)
                     }
                 }
                 fragment?.let { fgt ->
                     deniedPermissions.find { fgt.shouldShowRequestPermissionRationale(it) }?.let {
-                        onResult?.invoke(PermissionResult.DENIED)
+                        invoke(PermissionResult.DENIED)
                     } ?: run {
-                        onResult?.invoke(PermissionResult.NEVER_ASK_AGAIN)
+                        invoke(PermissionResult.NEVER_ASK_AGAIN)
                     }
                 }
             }
         }
+        onResult = null
     }
 }
