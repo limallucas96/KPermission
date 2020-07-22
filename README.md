@@ -1,8 +1,9 @@
 
-# KPermission
+
+## KPermission
 **An android library for handling permissions written in Kotlin.**
 
-# Usage
+## Usage
 
 Here's a minimum example, in which you register a `MainActivity` or a `Fragment` that whishes to take a picture. 
 
@@ -40,6 +41,7 @@ private lateinit var kPermission: KPermission
 ### 1.2 Request permission.
 
 You may request your permission and get it's result with two lamdas. `Ask` and `onResult`.
+
 `Ask` is a block of your app permissions and right after you can call `onResult` which will return `GRANTED`, `DENIED`  or `NEVER_ASK_AGAIN`.
 
 
@@ -48,7 +50,7 @@ camera.setOnClickListener {
     kPermission.ask {
         permission { name = Manifest.permission.CAMERA }
         permission { name = Manifest.permission.WRITE_EXTERNAL_STORAGE }
-    } onAskResult { result ->
+    } onResult { result ->
         when (result) {
             PermissionResult.GRANTED -> {}
             PermissionResult.DENIED -> {}
@@ -85,11 +87,11 @@ class MainActivity : AppCompatActivity() {
             kPermission.ask {
                 permission { name = Manifest.permission.CAMERA }
                 permission { name = Manifest.permission.WRITE_EXTERNAL_STORAGE }
-            } onAskResult { result ->
+            } onResult { result ->
                 when (result) {
-                    PermissionResult.GRANTED -> {}
-                    PermissionResult.DENIED -> {}
-                    PermissionResult.NEVER_ASK_AGAIN -> {}
+                    PermissionResult.GRANTED -> {} //All permissions were granted
+                    PermissionResult.DENIED -> {} // At least one was denied
+                    PermissionResult.NEVER_ASK_AGAIN -> {} //At least one was marked as never ask again
                 }
                 Toast.makeText(this, "Camera: $result", Toast.LENGTH_SHORT).show()
             }
