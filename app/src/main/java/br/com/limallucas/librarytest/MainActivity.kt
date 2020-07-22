@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
             permissionsUtils.ask {
                 permission { name = Manifest.permission.ACCESS_FINE_LOCATION }
                 permission { name = Manifest.permission.ACCESS_COARSE_LOCATION }
+                permission { name = Manifest.permission.ACCESS_BACKGROUND_LOCATION }
             } onAskResult { result ->
                 when (result) {
                     PermissionResult.GRANTED -> {}
@@ -46,7 +47,9 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Camera: $result", Toast.LENGTH_SHORT).show()
             }
         }
+
     }
+
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)

@@ -6,7 +6,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,7 +14,7 @@
         android:padding="10dp"
         android:text="Location" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/camera"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

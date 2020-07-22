@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:background="@android:color/holo_green_dark">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/audio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

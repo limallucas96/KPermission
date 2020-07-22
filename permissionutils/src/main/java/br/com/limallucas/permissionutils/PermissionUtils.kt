@@ -21,11 +21,32 @@ class PermissionUtils() {
     private var onResult: ((result: PermissionResult) -> Unit)? = null
     private var activity: Activity? = null
     private var fragment: Fragment? = null
+    private var permissions = listOf<String>()
 
     private fun greaterThanMarshmallow() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
 
     infix fun onAskResult(onResult: (result: PermissionResult) -> Unit) {
         this.onResult = onResult
+
+        if (permissions.isEmpty()) {
+            this.onResult = null
+            return
+        }
+
+        if (greaterThanMarshmallow()) {
+            if (checkSelfPermission(permissions.toTypedArray())) {
+                invoke(PermissionResult.GRANTED)
+            } else {
+                activity?.let {
+                    ActivityCompat.requestPermissions(it, permissions.toTypedArray(), 999)
+                }
+                fragment?.let {
+                    it.requestPermissions(permissions.toTypedArray(), 999)
+                }
+            }
+        } else {
+            invoke(PermissionResult.GRANTED)
+        }
     }
 
     private fun checkSelfPermission(permissions: Array<out String>): Boolean {
@@ -42,26 +63,7 @@ class PermissionUtils() {
     }
 
     fun ask(block: AppPermission.() -> Unit): PermissionUtils {
-        val permissions = AppPermission().apply(block).map { it.name }.toTypedArray()
-
-        if (permissions.isEmpty()) {
-            return this
-        }
-
-        if (greaterThanMarshmallow()) {
-            if (checkSelfPermission(permissions)) {
-                invoke(PermissionResult.GRANTED)
-            } else {
-                activity?.let {
-                    ActivityCompat.requestPermissions(it, permissions, 999)
-                }
-                fragment?.let {
-                    it.requestPermissions(permissions, 999)
-                }
-            }
-        } else {
-            invoke(PermissionResult.GRANTED)
-        }
+        permissions = AppPermission().apply(block).map { it.name }
         return this
     }
 
