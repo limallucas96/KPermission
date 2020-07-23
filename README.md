@@ -1,116 +1,106 @@
-# PermissionUtils
-Android library for handling permissions. Written in kotlin.
+
+
+## KPermission
+**An android library for handling permissions written in Kotlin.**
+
 ## Usage
 
-Here's a minimum example, in which you register a `MainActivity` that requires `Manifest.permission.CAMERA`.
+Here's a minimum example, in which you register a `MainActivity` or a `Fragment` that whishes to take a picture. 
 
 ### 0. Prepare AndroidManifest
 
-Add the following line to `AndroidManifest.xml`:
+Add the following lines to `AndroidManifest.xml`:
  
-`<uses-permission android:name="android.permission.CAMERA" />`
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        package="com.example.snazzyapp">
 
-### 1. Implementation
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- other permissions go here -->
 
-### 1.1 Init the PermissionUtils library and make sure to give an activity and listener context. Otherwise it will throw NullPointerException.
-
-```kotlin
-private lateinit var permissionsUtils: PermissionUtils
-
-permissionsUtils = PermissionUtils.permissionBuilder {
-   activity = this@MainActivity
-   listener = this@MainActivity
-}
+    <application ...>
+        ...
+    </application>
+</manifest>
 ```
 
-### 1.2 Asking for permissions.
+## 1. Implementation
 
-Use the method `ask`. It requires a RequestCode and a String Array of permissions.
+### 1.1 Init the KPermission library.
 
-The code will be returned by the interface methods, so you can deal with success or erros. 
+```kotlin
+private lateinit var kPermission: KPermission
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        kPermission = KPermission(this)
+    }
+```
+
+### 1.2 Request permission.
+
+You may request your permission and get it's result with two lamdas. `Ask` and `onResult`.
+
+`Ask` is a block of your app permissions and right after you can call `onResult` which will return `GRANTED`, `DENIED`  or `NEVER_ASK_AGAIN`.
+
 
 ```kotlin
 camera.setOnClickListener {
-  permissionsUtils.ask(
-      PermissionType.CAMERA_TYPE.code,
-      PermissionType.CAMERA_TYPE.permissions
- )
+    kPermission.ask {
+        permission { name = Manifest.permission.CAMERA }
+        permission { name = Manifest.permission.WRITE_EXTERNAL_STORAGE }
+    } onResult { result ->
+        when (result) {
+            PermissionResult.GRANTED -> {} //All permissions were granted
+            PermissionResult.DENIED -> {} // At least one was denied
+            PermissionResult.NEVER_ASK_AGAIN -> {} //At least one was marked as never ask again
+        }
+        Toast.makeText(this, "Camera: $result", Toast.LENGTH_SHORT).show()
+    }
 }
 ```
 
 ### 1.3 Let the library handle the permission result. 
 
 ```kotlin
-override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<out String>,grantResults: IntArray){
-  super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-  permissionsUtils.onRequestPermissionsResult(requestCode, grantResults)
+override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    kPermission.onRequestPermissionsResult(requestCode, permissions, grantResults)
 }
-```
-
-### 1.4 Get the result by PermissionListener interface methods callback.
-
-```kotlin
- override fun onPermissionGranted(requestCode: Int) {}
- override fun onPermissionDenied(requestCode: Int) {}
 ```
 
 ## Full implementation
 
 ```kotlin
-class MainActivity : AppCompatActivity(), PermissionListener {
+class MainActivity : AppCompatActivity() {
 
-    private lateinit var permissionsUtils: PermissionUtils
+    private lateinit var kPermission: KPermission
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        permissionsUtils = PermissionUtils.permissionBuilder {
-            activity = this@MainActivity
-            listener = this@MainActivity
-        }
+        kPermission = KPermission(this)
 
         camera.setOnClickListener {
-            permissionsUtils.ask(
-                PermissionType.CAMERA_TYPE.code,
-                PermissionType.CAMERA_TYPE.permissions
-            )
+            kPermission.ask {
+                permission { name = Manifest.permission.CAMERA }
+                permission { name = Manifest.permission.WRITE_EXTERNAL_STORAGE }
+            } onResult { result ->
+                when (result) {
+                    PermissionResult.GRANTED -> {} //All permissions were granted
+                    PermissionResult.DENIED -> {} // At least one was denied
+                    PermissionResult.NEVER_ASK_AGAIN -> {} //At least one was marked as never ask again
+                }
+                Toast.makeText(this, "Camera: $result", Toast.LENGTH_SHORT).show()
+            }
         }
-    
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        permissionsUtils.onRequestPermissionsResult(requestCode, grantResults)
-    }
-
-    override fun onPermissionGranted(requestCode: Int) {
-        //Treated granted permission based on request code
-        val result = "onPermissionGranted ${PermissionType.fromInt(requestCode)?.name}"
-        Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onPermissionDenied(requestCode: Int) {
-        //Treated denied permission based on request code
-        val result = "onPermissionDenied ${PermissionType.fromInt(requestCode)?.name}"
-        Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
-    }
-}
-
-```
-
-### 2. We strongly recommend to create an enum class to organize your permissions. 
-
-We advise you to organize your requests code and permissions inside an enum class. 
-
-
-```kotlin
-enum class PermissionType(val code: Int, val permissions: Array<String>) {
-    CAMERA_TYPE(123, arrayOf(CAMERA, WRITE_EXTERNAL_STORAGE));
-    companion object {
-        fun fromInt(code: Int) = values().firstOrNull { it.code == code }
+        kPermission.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }
 ```
