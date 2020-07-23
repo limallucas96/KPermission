@@ -52,9 +52,9 @@ camera.setOnClickListener {
         permission { name = Manifest.permission.WRITE_EXTERNAL_STORAGE }
     } onResult { result ->
         when (result) {
-            PermissionResult.GRANTED -> {}
-            PermissionResult.DENIED -> {}
-            PermissionResult.NEVER_ASK_AGAIN -> {}
+            PermissionResult.GRANTED -> {} //All permissions were granted
+            PermissionResult.DENIED -> {} // At least one was denied
+            PermissionResult.NEVER_ASK_AGAIN -> {} //At least one was marked as never ask again
         }
         Toast.makeText(this, "Camera: $result", Toast.LENGTH_SHORT).show()
     }
