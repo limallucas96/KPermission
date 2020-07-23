@@ -8,7 +8,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 
-class PermissionUtils() {
+class KPermission() {
 
     constructor(activity: Activity) : this() {
         this.activity = activity
@@ -25,7 +25,7 @@ class PermissionUtils() {
 
     private fun greaterThanMarshmallow() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
 
-    infix fun onAskResult(onResult: (result: PermissionResult) -> Unit) {
+    infix fun onResult(onResult: (result: PermissionResult) -> Unit) {
         this.onResult = onResult
 
         if (permissions.isEmpty()) {
@@ -62,7 +62,7 @@ class PermissionUtils() {
         onResult = null
     }
 
-    fun ask(block: AppPermission.() -> Unit): PermissionUtils {
+    fun ask(block: AppPermission.() -> Unit): KPermission {
         permissions = AppPermission().apply(block).map { it.name }
         return this
     }
@@ -71,6 +71,7 @@ class PermissionUtils() {
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
 
         if (grantResults.isEmpty()) {
+            onResult = null
             return
         }
 
@@ -96,6 +97,5 @@ class PermissionUtils() {
                 }
             }
         }
-        onResult = null
     }
 }

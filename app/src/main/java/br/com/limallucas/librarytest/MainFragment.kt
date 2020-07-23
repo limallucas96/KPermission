@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import br.com.limallucas.permissionutils.PermissionResult
-import br.com.limallucas.permissionutils.PermissionUtils
+import br.com.limallucas.permissionutils.KPermission
 import kotlinx.android.synthetic.main.fragment_main.*
 
 class MainFragment : Fragment() {
 
-    private lateinit var permissionsUtils: PermissionUtils
+    private lateinit var kPermission: KPermission
 
     companion object {
         fun getInstance() : MainFragment {
@@ -27,13 +27,13 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        permissionsUtils =  PermissionUtils(this)
+        kPermission =  KPermission(this)
 
         audio.setOnClickListener {
-            permissionsUtils.ask {
+            kPermission.ask {
                 permission { name = android.Manifest.permission.RECORD_AUDIO }
                 permission { name = android.Manifest.permission.WRITE_EXTERNAL_STORAGE }
-            } onAskResult { result ->
+            } onResult { result ->
                 when (result) {
                     PermissionResult.GRANTED -> {}
                     PermissionResult.DENIED -> {}
@@ -46,7 +46,7 @@ class MainFragment : Fragment() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        permissionsUtils.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        kPermission.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }
 
