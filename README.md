@@ -124,6 +124,6 @@ Add the dependency
 
 ```groovy
 dependencies {
-  implementation 'com.github.limallucas96:PermissionUtils:0.1.0'
+  implementation 'com.github.limallucas96:KPermission:0.1.1'
 }
 ```
