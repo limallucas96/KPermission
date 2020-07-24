@@ -1,12 +1,17 @@
 package br.com.limallucas.permissionutils
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import br.com.limallucas.permissionutils.KUtils.isGreaterThanM
+import br.com.limallucas.permissionutils.KUtils.isGreaterThanMAndLessThanQ
+import br.com.limallucas.permissionutils.KUtils.isGreaterThanQ
 
 class KPermission() {
 
@@ -21,9 +26,23 @@ class KPermission() {
     private var onResult: ((result: PermissionResult) -> Unit)? = null
     private var activity: Activity? = null
     private var fragment: Fragment? = null
-    private var permissions = listOf<String>()
+    private var permissions = mutableListOf<String>()
 
-    private fun greaterThanMarshmallow() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+    private fun invokeBySDK() {
+        val contains = permissions.any { it == Manifest.permission.ACCESS_BACKGROUND_LOCATION }
+        if (contains) {
+            invoke(PermissionResult.GRANTED_ALL_THE_TIME)
+        } else {
+            invoke(PermissionResult.GRANTED)
+        }
+    }
+
+    private fun filterPermissionsBySDK() {
+        if (isGreaterThanMAndLessThanQ()) {
+            permissions = permissions.filterNot { it == Manifest.permission.ACCESS_BACKGROUND_LOCATION }.toMutableList()
+
+        }
+    }
 
     infix fun onResult(onResult: (result: PermissionResult) -> Unit) {
         this.onResult = onResult
@@ -33,9 +52,11 @@ class KPermission() {
             return
         }
 
-        if (greaterThanMarshmallow()) {
+        filterPermissionsBySDK()
+
+        if (isGreaterThanM()) {
             if (checkSelfPermission(permissions.toTypedArray())) {
-                invoke(PermissionResult.GRANTED)
+                invokeBySDK()
             } else {
                 activity?.let {
                     ActivityCompat.requestPermissions(it, permissions.toTypedArray(), 999)
@@ -63,38 +84,61 @@ class KPermission() {
     }
 
     fun ask(block: AppPermission.() -> Unit): KPermission {
-        permissions = AppPermission().apply(block).map { it.name }
+        permissions = AppPermission().apply(block).map { it.name }.toMutableList()
         return this
     }
 
     @SuppressLint("NewApi")
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
 
-        if (grantResults.isEmpty()) {
+        if (grantResults.isEmpty() || permissions.isEmpty() || (grantResults.size != permissions.size)) {
             onResult = null
             return
         }
 
         val didGrantAllPermissions = grantResults.map { it == PackageManager.PERMISSION_GRANTED }.find { !it } ?: true
 
-        if (didGrantAllPermissions) {
-            invoke(PermissionResult.GRANTED)
+        if (isGreaterThanQ()) {
+            if (didGrantAllPermissions) {
+                invokeBySDK()
+            } else {
+                mutableListOf<Pair<String, Int>>().apply {
+                    permissions.forEachIndexed { index, permission ->
+                        this.add(Pair(permission, grantResults[index]))
+                    }
+                }.filterNot { it.first == Manifest.permission.ACCESS_BACKGROUND_LOCATION }.map { it.first }.let { deniedPermissions ->
+                    shouldShowRequestPermissionRationale(deniedPermissions)
+                }
+            }
         } else {
-            permissions.filterIndexed { index, _ -> grantResults[index] != PackageManager.PERMISSION_GRANTED }.let { deniedPermissions ->
-                activity?.let { act ->
-                    deniedPermissions.find { act.shouldShowRequestPermissionRationale(it) }?.let {
-                        invoke(PermissionResult.DENIED)
-                    } ?: run {
-                        invoke(PermissionResult.NEVER_ASK_AGAIN)
-                    }
+            if (didGrantAllPermissions) {
+                invoke(PermissionResult.GRANTED)
+            } else {
+                permissions.filterIndexed { index, _ -> grantResults[index] != PackageManager.PERMISSION_GRANTED }.let { deniedPermissions ->
+                    shouldShowRequestPermissionRationale(deniedPermissions)
                 }
-                fragment?.let { fgt ->
-                    deniedPermissions.find { fgt.shouldShowRequestPermissionRationale(it) }?.let {
-                        invoke(PermissionResult.DENIED)
-                    } ?: run {
-                        invoke(PermissionResult.NEVER_ASK_AGAIN)
-                    }
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun shouldShowRequestPermissionRationale(deniedPermissions: List<String>) {
+        activity?.let { act ->
+            if (checkSelfPermission(deniedPermissions.toTypedArray())) {
+                invoke(PermissionResult.GRANTED)
+            } else {
+                deniedPermissions.find { act.shouldShowRequestPermissionRationale(it) }?.let {
+                    invoke(PermissionResult.DENIED)
+                } ?: run {
+                    invoke(PermissionResult.NEVER_ASK_AGAIN)
                 }
+            }
+        }
+        fragment?.let { fgt ->
+            deniedPermissions.find { fgt.shouldShowRequestPermissionRationale(it) }?.let {
+                invoke(PermissionResult.DENIED)
+            } ?: run {
+                invoke(PermissionResult.NEVER_ASK_AGAIN)
             }
         }
     }

@@ -19,10 +19,27 @@ class MainActivity : AppCompatActivity() {
         addFragment(MainFragment.getInstance())
         kPermission = KPermission(this)
 
+        location.setOnClickListener {
+            kPermission.ask {
+                permission { name = Manifest.permission.ACCESS_FINE_LOCATION }
+                permission { name = Manifest.permission.ACCESS_COARSE_LOCATION }
+                permission { name = Manifest.permission.ACCESS_BACKGROUND_LOCATION }
+            } onResult { result ->
+                when (result) {
+                    PermissionResult.GRANTED -> { }
+                    PermissionResult.DENIED -> { }
+                    PermissionResult.NEVER_ASK_AGAIN -> { }
+                    PermissionResult.GRANTED_ALL_THE_TIME -> { }
+                }
+                Toast.makeText(this, "Location: $result", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         camera.setOnClickListener {
             kPermission.ask {
                 permission { name = Manifest.permission.CAMERA }
                 permission { name = Manifest.permission.WRITE_EXTERNAL_STORAGE }
+
             } onResult { result ->
                 when (result) {
                     PermissionResult.GRANTED -> {
@@ -33,23 +50,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 Toast.makeText(this, "Camera: $result", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        location.setOnClickListener {
-            kPermission.ask {
-                permission { name = Manifest.permission.ACCESS_FINE_LOCATION }
-                permission { name = Manifest.permission.ACCESS_COARSE_LOCATION }
-            } onResult { result ->
-                when (result) {
-                    PermissionResult.GRANTED -> {
-                    }
-                    PermissionResult.DENIED -> {
-                    }
-                    PermissionResult.NEVER_ASK_AGAIN -> {
-                    }
-                }
-                Toast.makeText(this, "Location: $result", Toast.LENGTH_SHORT).show()
             }
         }
 
