@@ -1,9 +1,4 @@
 
-
-
-
-
-
 ## KPermission
 **An android library for handling permissions written in Kotlin.**
 
@@ -65,10 +60,10 @@ location.setOnClickListener {
         permission { name = Manifest.permission.ACCESS_BACKGROUND_LOCATION }
     } onResult { result ->
         when (result) {
-            PermissionResult.GRANTED_EVER -> {} //User accepted all permissions
-            PermissionResult.GRANTED_IN_APP -> {} //User accepted all permissions but only this time and in foreground
-            PermissionResult.DENIED -> {} //Denied
-            PermissionResult.NEVER_ASK_AGAIN -> {} //Never ask again
+           	 PermissionResult.GRANTED_EVER -> {} //User accepted all permissions
+           	 PermissionResult.GRANTED_IN_APP -> {} //User accepted all permissions but in foreground
+          	 PermissionResult.DENIED -> {} //Denied
+           	 PermissionResult.NEVER_ASK_AGAIN -> {} //Never ask again
         }
         Toast.makeText(this, "Location: $result", Toast.LENGTH_SHORT).show()
     }
@@ -77,8 +72,12 @@ location.setOnClickListener {
 
 **NOTE**
 
- 1. If your application targets SDK 29 or higher , then be sure to listen for `GRANTED_EVER` and `GRANTED_IN_APP` results, since the user might not grant you background access.
- 2. If your application targets SDK 29 or higher , and your permission list do contain any background permission, then the result should automatically be `GRANTED_EVER` (Check section #2)
+ 1. If your application targets SDK 29 or higher , and your permission list DO contain any background permission, then be sure to listen for `GRANTED_EVER` and `GRANTED_IN_APP` results, since the user might not grant you background access.
+ 
+ 
+ 2. If your application targets SDK 29 or higher , and your permission list do NOT contain any background permission, then the result should automatically be `GRANTED_EVER` 
+
+
  3. If your application targets SDK 28 or less, then `GRANTED_EVER` result should be enough.
 
 
@@ -111,58 +110,15 @@ class MainActivity : AppCompatActivity() {
                 permission { name = Manifest.permission.ACCESS_BACKGROUND_LOCATION }
             } onResult { result ->
                 when (result) {
-		            PermissionResult.GRANTED_EVER -> {} //User accepted all permissions
-		            PermissionResult.GRANTED_IN_APP -> {} //User accepted all permissions but only this time and in foreground
-                    PermissionResult.DENIED -> {} //Denied
-                    PermissionResult.NEVER_ASK_AGAIN -> {} //Never ask again
+           		PermissionResult.GRANTED_EVER -> {} //User accepted all permissions
+           		PermissionResult.GRANTED_IN_APP -> {} //User accepted all permissions but in foreground
+           		PermissionResult.DENIED -> {} //Denied
+           		PermissionResult.NEVER_ASK_AGAIN -> {} //Never ask again
                 }
                 Toast.makeText(this, "Location: $result", Toast.LENGTH_SHORT).show()
             }
         }
 
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        kPermission.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-}
-```
-
-## 2. Permission with no background access
-
-Add the following lines to `AndroidManifest.xml`:
- 
-```xml
-<uses-permission android:name="android.permission.CAMERA" />  
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-```
-If your permissions do not require any background access like `CAMERA` or `WRITE_EXTERNAL_STORAGE` , then `GRANTED_EVER` is should be enough to know when all permissions are granted. 
-
-```kotlin
-class MainActivity : AppCompatActivity() {
-
-    private lateinit var kPermission: KPermission
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        kPermission = KPermission(this)
-
-        camera.setOnClickListener {
-            kPermission.ask {
-                permission { name = Manifest.permission.CAMERA }
-                permission { name = Manifest.permission.WRITE_EXTERNAL_STORAGE }
-            } onResult { result ->
-                when (result) {
-                    PermissionResult.GRANTED_EVER -> {} //User accepted all permissions.
-                    PermissionResult.DENIED -> {} //User denied one or more permissions.
-                    PermissionResult.NEVER_ASK_AGAIN -> {} //User marked one or more permissions as never ask again.
-                }
-                Toast.makeText(this, "Camera: $result", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
