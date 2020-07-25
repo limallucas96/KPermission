@@ -1,4 +1,5 @@
 
+
 ## KPermission
 **An android library for handling permissions written in Kotlin.**
 
@@ -40,15 +41,15 @@ private lateinit var kPermission: KPermission
 
 ### 1.2 Request permission.
 
-You may request your permission and get it's result with two lamdas. `Ask` and `onResult`.
+You may request your permission with `ask` and get it's result with `onResult`.
 
-`Ask` is a block of your app permissions. Add the permissions you want to ask inside it.
+`Ask` is a block of your application permissions. Add the permissions you want to ask inside it.
 
-`onResult` will return a state for your ask. 
-The result might be: 
+`onResult` is a block that will return a state for your ask. 
+The state might be: 
 
  - **GRANTED_EVER** -> User accepted all permissions to run all the time. 
- - **GRANTED_IN_APP** -> User accepted all permissions but only this time and in foreground. 
+ - **GRANTED_IN_APP** -> User accepted all permissions but in foreground. 
  - **DENIED** -> User denied one or more permissions.
  - **NEVER_ASK_AGAIN** -> User marked one or more permissions as never ask again.
 
