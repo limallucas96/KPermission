@@ -22,6 +22,14 @@
         android:padding="10dp"
         android:text="Camera" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/ask_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="ALL PERMISSIONS" />
+
     <FrameLayout
         android:id="@+id/frame_layout"
         android:layout_width="match_parent"

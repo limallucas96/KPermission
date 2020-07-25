@@ -1,8 +1,10 @@
 package br.com.limallucas.librarytest
 
 import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import br.com.limallucas.permissionutils.KPermission
@@ -26,10 +28,10 @@ class MainActivity : AppCompatActivity() {
                 permission { name = Manifest.permission.ACCESS_BACKGROUND_LOCATION }
             } onResult { result ->
                 when (result) {
-                    PermissionResult.GRANTED -> { }
-                    PermissionResult.DENIED -> { }
-                    PermissionResult.NEVER_ASK_AGAIN -> { }
-                    PermissionResult.GRANTED_ALL_THE_TIME -> { }
+                    PermissionResult.GRANTED_EVER -> {} //Granted
+                    PermissionResult.GRANTED_IN_APP -> {} //Granted only this time
+                    PermissionResult.DENIED -> {} //Denied
+                    PermissionResult.NEVER_ASK_AGAIN -> {} //Never ask again
                 }
                 Toast.makeText(this, "Location: $result", Toast.LENGTH_SHORT).show()
             }
@@ -41,15 +43,20 @@ class MainActivity : AppCompatActivity() {
                 permission { name = Manifest.permission.WRITE_EXTERNAL_STORAGE }
 
             } onResult { result ->
-                when (result) {
-                    PermissionResult.GRANTED -> {
-                    }
-                    PermissionResult.DENIED -> {
-                    }
-                    PermissionResult.NEVER_ASK_AGAIN -> {
-                    }
-                }
                 Toast.makeText(this, "Camera: $result", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        ask_all.setOnClickListener {
+            kPermission.ask {
+                permission { name = Manifest.permission.CAMERA }
+                permission { name = Manifest.permission.RECORD_AUDIO }
+                permission { name = Manifest.permission.WRITE_EXTERNAL_STORAGE }
+                permission { name = Manifest.permission.ACCESS_FINE_LOCATION }
+                permission { name = Manifest.permission.ACCESS_COARSE_LOCATION }
+                permission { name = Manifest.permission.ACCESS_BACKGROUND_LOCATION }
+            } onResult { result ->
+                Toast.makeText(this, "ask all: $result", Toast.LENGTH_SHORT).show()
             }
         }
 

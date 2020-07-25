@@ -14,4 +14,12 @@
         android:padding="10dp"
         android:text="Audio" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/ask_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="ALL PERMISSIONS" />
+
 </LinearLayout>

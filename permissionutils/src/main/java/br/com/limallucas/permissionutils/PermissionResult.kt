@@ -1,6 +1,5 @@
 package br.com.limallucas.permissionutils
 
 enum class PermissionResult {
-    GRANTED, GRANTED_ALL_THE_TIME, DENIED, NEVER_ASK_AGAIN
-    //GRANTED, ONLY_THIS_TIME, DENIED, NEVER_ASK_ASK
+    GRANTED_EVER, GRANTED_IN_APP, DENIED, NEVER_ASK_AGAIN
 }
