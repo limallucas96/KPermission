@@ -1,11 +1,15 @@
 
 
+
+
+
+
 ## KPermission
 **An android library for handling permissions written in Kotlin.**
 
 ## Usage
 
-Here's a minimum example, in which you register a `MainActivity` or a `Fragment` that whishes to take a picture. 
+Here's a minimum example, in which you register a `MainActivity` or a `Fragment` that whishes to access user's location. 
 
 ### 0. Prepare AndroidManifest
 
@@ -15,8 +19,9 @@ Add the following lines to `AndroidManifest.xml`:
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         package="com.example.snazzyapp">
 
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />  
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />  
+<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <!-- other permissions go here -->
 
     <application ...>
@@ -42,24 +47,40 @@ private lateinit var kPermission: KPermission
 
 You may request your permission and get it's result with two lamdas. `Ask` and `onResult`.
 
-`Ask` is a block of your app permissions and right after you can call `onResult` which will return `GRANTED`, `DENIED`  or `NEVER_ASK_AGAIN`.
+`Ask` is a block of your app permissions. Add the permissions you want to ask inside it.
 
+`onResult` will return a state for your ask. 
+The result might be: 
+
+ - **GRANTED_EVER** -> User accepted all permissions to run all the time. 
+ - **GRANTED_IN_APP** -> User accepted all permissions but only this time and in foreground. 
+ - **DENIED** -> User denied one or more permissions.
+ - **NEVER_ASK_AGAIN** -> User marked one or more permissions as never ask again.
 
 ```kotlin
-camera.setOnClickListener {
+location.setOnClickListener {
     kPermission.ask {
-        permission { name = Manifest.permission.CAMERA }
-        permission { name = Manifest.permission.WRITE_EXTERNAL_STORAGE }
+        permission { name = Manifest.permission.ACCESS_FINE_LOCATION }
+        permission { name = Manifest.permission.ACCESS_COARSE_LOCATION }
+        permission { name = Manifest.permission.ACCESS_BACKGROUND_LOCATION }
     } onResult { result ->
         when (result) {
-            PermissionResult.GRANTED -> {} //All permissions were granted
-            PermissionResult.DENIED -> {} // At least one was denied
-            PermissionResult.NEVER_ASK_AGAIN -> {} //At least one was marked as never ask again
+            PermissionResult.GRANTED_EVER -> {} //User accepted all permissions
+            PermissionResult.GRANTED_IN_APP -> {} //User accepted all permissions but only this time and in foreground
+            PermissionResult.DENIED -> {} //Denied
+            PermissionResult.NEVER_ASK_AGAIN -> {} //Never ask again
         }
-        Toast.makeText(this, "Camera: $result", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Location: $result", Toast.LENGTH_SHORT).show()
     }
 }
 ```
+
+**NOTE**
+
+ 1. If your application targets SDK 29 or higher , then be sure to listen for `GRANTED_EVER` and `GRANTED_IN_APP` results, since the user might not grant you background access.
+ 2. If your application targets SDK 29 or higher , and your permission list do contain any background permission, then the result should automatically be `GRANTED_EVER` (Check section #2)
+ 3. If your application targets SDK 28 or less, then `GRANTED_EVER` result should be enough.
+
 
 ### 1.3 Let the library handle the permission result. 
 
@@ -83,15 +104,61 @@ class MainActivity : AppCompatActivity() {
 
         kPermission = KPermission(this)
 
+        location.setOnClickListener {
+            kPermission.ask {
+                permission { name = Manifest.permission.ACCESS_FINE_LOCATION }
+                permission { name = Manifest.permission.ACCESS_COARSE_LOCATION }
+                permission { name = Manifest.permission.ACCESS_BACKGROUND_LOCATION }
+            } onResult { result ->
+                when (result) {
+		            PermissionResult.GRANTED_EVER -> {} //User accepted all permissions
+		            PermissionResult.GRANTED_IN_APP -> {} //User accepted all permissions but only this time and in foreground
+                    PermissionResult.DENIED -> {} //Denied
+                    PermissionResult.NEVER_ASK_AGAIN -> {} //Never ask again
+                }
+                Toast.makeText(this, "Location: $result", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        kPermission.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+}
+```
+
+## 2. Permission with no background access
+
+Add the following lines to `AndroidManifest.xml`:
+ 
+```xml
+<uses-permission android:name="android.permission.CAMERA" />  
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
+If your permissions do not require any background access like `CAMERA` or `WRITE_EXTERNAL_STORAGE` , then `GRANTED_EVER` is should be enough to know when all permissions are granted. 
+
+```kotlin
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var kPermission: KPermission
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        kPermission = KPermission(this)
+
         camera.setOnClickListener {
             kPermission.ask {
                 permission { name = Manifest.permission.CAMERA }
                 permission { name = Manifest.permission.WRITE_EXTERNAL_STORAGE }
             } onResult { result ->
                 when (result) {
-                    PermissionResult.GRANTED -> {} //All permissions were granted
-                    PermissionResult.DENIED -> {} // At least one was denied
-                    PermissionResult.NEVER_ASK_AGAIN -> {} //At least one was marked as never ask again
+                    PermissionResult.GRANTED_EVER -> {} //User accepted all permissions.
+                    PermissionResult.DENIED -> {} //User denied one or more permissions.
+                    PermissionResult.NEVER_ASK_AGAIN -> {} //User marked one or more permissions as never ask again.
                 }
                 Toast.makeText(this, "Camera: $result", Toast.LENGTH_SHORT).show()
             }
@@ -104,7 +171,6 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
-
 
 ## Installation
 
