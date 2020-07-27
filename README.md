@@ -147,6 +147,6 @@ Add the dependency
 
 ```groovy
 dependencies {
-  implementation 'com.github.limallucas96:KPermission:0.1.1'
+  implementation 'com.github.limallucas96:KPermission:0.1.2'
 }
 ```
