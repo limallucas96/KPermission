@@ -131,7 +131,7 @@ class MainActivity : AppCompatActivity() {
 
 ## Installation
 
-Current version: 0.1.0
+Current version: 0.1.2
 
 Add it in your root build.gradle at the end of repositories:
 
